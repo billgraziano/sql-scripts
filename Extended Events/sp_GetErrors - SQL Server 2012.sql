@@ -1,11 +1,12 @@
-USE MASTER
-GO
-IF OBJECT_ID('dbo.sp_GetErrors') IS NULL
-	EXEC ('CREATE PROC dbo.sp_GetErrors AS SELECT 1');
-GO
 
-ALTER PROC dbo.sp_GetErrors
+USE MASTER
+go
+IF NOT EXISTS (SELECT * from sys.sql_modules where object_name(object_id) = 'sp_GetErrors')
+	EXEC('CREATE PROC dbo.sp_GetErrors AS SELECT 1');
+GO	
+ALTER PROCEDURE dbo.sp_GetErrors
 AS
+
 IF OBJECT_ID('tempdb..#ee') IS NOT NULL
 	DROP TABLE #ee
 
@@ -32,8 +33,7 @@ SELECT
         COALESCE(event_data.value('(event/data[@name="database_id"]/value)[1]', 'int'), 
             event_data.value('(event/action[@name="database_id"]/value)[1]', 'int')) AS database_id,
             
-        --event_data.value('(event/data[@name="error"]/value)[1]', 'int') as [error],
-		event_data.value('(event/data[@name="error_number"]/value)[1]', 'int') as [error_number],
+        event_data.value('(event/data[@name="error_number"]/value)[1]', 'int') as [error],
         event_data.value('(event/data[@name="severity"]/value)[1]', 'int') as [severity],
         event_data.value('(event/data[@name="message"]/value)[1]', 'nvarchar(1000)') as [error_message],
         
@@ -58,14 +58,13 @@ SELECT
         --event_data.value('(event/data[@name="object_type"]/text)[1]', 'int') AS [object_type],
         --CAST(SUBSTRING(event_data.value('(event/action[@name="attach_activity_id"]/value)[1]', 'varchar(50)'), 1, 36) AS uniqueidentifier) as activity_id,
         --CAST(SUBSTRING(event_data.value('(event/action[@name="attach_activity_id"]/value)[1]', 'varchar(50)'), 38, 10) AS int) as event_sequence
-        , event_data
 FROM #ee )
 select    event_name 
     ,[timestamp] 
-     ,[collect_system_time]
-     , dateadd(minute, datepart(TZoffset, sysdatetimeoffset()), [collect_system_time]) AS [system_time]
+     --,[collect_system_time]
+     --, dateadd(minute, datepart(TZoffset, sysdatetimeoffset()), [collect_system_time]) AS [system_time]
     ,[error_message]
-    ,error_number
+    ,error
     ,severity
 	,CAST('<?query -- 
 ' + sql_text + '
@@ -74,13 +73,14 @@ select    event_name
     ,client_hostname
     ,username 
     ,tsql_stack
-    ,event_data
 from CTE
-where error_number NOT IN (
+where error NOT IN (
 	2557 -- show statistics
 	, 17830 -- network error occurred
 	, 8429 -- 
 	, 8462 -- conversation is closed
 	)
-order by [timestamp] DESC, [collect_system_time] DESC
+order by [collect_system_time] DESC
+     
 GO
+

@@ -15,9 +15,17 @@ CREATE EVENT SESSION ErrorSession ON SERVER
         WHERE severity >= 16 and error <> 2557 and error <> 17830
     )  
     ADD TARGET package0.ring_buffer    
-        (SET max_memory = 4096)
+        (SET max_memory = 1024)
 WITH (max_dispatch_latency = 1 seconds, EVENT_RETENTION_MODE = ALLOW_SINGLE_EVENT_LOSS, STARTUP_STATE = ON)
 
 IF EXISTS (select * from sys.server_event_sessions where [name] = 'ErrorSession')
 	ALTER EVENT SESSION ErrorSession ON SERVER STATE = START
+	
+
+/*
+
+https://www.sqlskills.com/blogs/jonathan/why-i-hate-the-ring_buffer-target-in-extended-events/
+http://blogs.msdn.com/b/psssql/archive/2009/09/17/you-may-not-see-the-data-you-expect-in-extended-event-ring-buffer-targets.aspx
+
+*/	
 
