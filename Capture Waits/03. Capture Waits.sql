@@ -29,9 +29,9 @@ select
 	,cap.wait_time_ms
 	,cap.max_wait_time_ms
 	,cap.signal_wait_time_ms
-	,interval_ms = DATEDIFF(ms, @previous_capture, cap.collection_time)
 	,wait_time_interval = COALESCE(cap.wait_time_ms - previous.wait_time_ms, 0)
 	,signal_wait_time_interval = COALESCE(cap.signal_wait_time_ms - previous.signal_wait_time_ms, 0)
+	,interval_ms = DATEDIFF(ms, @previous_capture, cap.collection_time)
 
 -- ,* 
 from #waits cap 
