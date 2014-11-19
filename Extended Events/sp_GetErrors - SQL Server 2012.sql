@@ -80,7 +80,7 @@ where error NOT IN (
 	, 8429 -- 
 	, 8462 -- conversation is closed
 	)
-order by [collect_system_time] DESC
+order by [timestamp] DESC
      
 GO
 
