@@ -21,7 +21,8 @@ ALTER PROCEDURE [dbo].[sp_ClearTrace] (
 	@MinReads BIGINT = NULL,
 	@MinDuration BIGINT = NULL,
 	@MinWrites BIGINT = NULL,
-	@IncludeStatements BIT = 0 
+	@IncludeStatements BIT = 0
+	,@Help BIT = 0
 		)
 AS
 
@@ -36,7 +37,7 @@ AS
 
 SET NOCOUNT ON 
 
-IF @Directory IS NULL OR @FileName is NULL 
+IF @Directory IS NULL OR @FileName is NULL OR @Help = 1
   BEGIN
 	PRINT 'Usage: sp_ClearTrace
 	 
@@ -51,6 +52,7 @@ IF @Directory IS NULL OR @FileName is NULL
 	@MinDuration (Optional),
 	@MinWrites (Optional),
 	@IncludeStatements (Optional -- Defaults to 0 [WARNING: HUGE TRACE!])
+	@Help (Optional)
 	'
 	return 1
   END
