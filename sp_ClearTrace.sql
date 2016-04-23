@@ -22,6 +22,7 @@ ALTER PROCEDURE [dbo].[sp_ClearTrace] (
 	@MinDuration BIGINT = NULL,
 	@MinWrites BIGINT = NULL,
 	@IncludeStatements BIT = 0
+	,@AppName NVARCHAR(256) = NULL
 	,@Help BIT = 0
 		)
 AS
@@ -30,7 +31,7 @@ AS
 --
 -- Trace creation script for use with ClearTrace
 --
--- Copyright ScaleOut Consulting, LLC
+-- Copyright ScaleOut Consulting, LLC 2016
 -- 
 ----------------------------------------------------------------------------------
 
@@ -44,7 +45,7 @@ IF @Directory IS NULL OR @FileName is NULL OR @Help = 1
 	@Directory (Required), 
 	@FileName (Required),
 
-	@TraceMinutes (Optional -- Defaults to 5),
+	@Minutes (Optional -- Defaults to 5),
 	@IncludeTimeStamp (Optional -- Defaults to 1),
 	@MaxFileSize (Optional -- Defaults to 200),
 	@MinCPU (Optional),
@@ -196,8 +197,21 @@ declare @bigintfilter bigint
 
 exec sp_trace_setfilter @TraceID, 10, 0, 7, N'SQL Profiler'
 
+-- App Name Filter
+IF @AppName IS NOT NULL
+  BEGIN
+	exec @RC = sp_trace_setfilter @TraceID, 10, 0, 0, @AppName 
+	if (@RC <> 0) 
+	    BEGIN
+		RAISERROR ('Failed to set filter on Application Name', 16, 1)
+		return @RC
+	    END
+  END
+
 -- exclude the connectioin pooling reset command
 exec sp_trace_setfilter @TraceID, 1, 0, 7, N'exec sp_reset_connection'
+
+
 
 -- Duration Filter
 IF @MinDuration IS NOT NULL
