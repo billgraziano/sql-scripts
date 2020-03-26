@@ -18,7 +18,7 @@ CREATE FUNCTION [dbo].[fn_hexadecimal]
 	-- Add the parameters for the function here
 	 @binvalue varbinary(256)
 )
-RETURNS VARCHAR(256)
+RETURNS VARCHAR(1024)
 AS
 BEGIN
 
