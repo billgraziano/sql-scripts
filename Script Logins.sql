@@ -29,8 +29,10 @@ select 'IF NOT EXISTS (SELECT * FROM master.sys.sql_logins WHERE [name] = ''' + 
 	CREATE LOGIN [' + [name] + '] 
 		WITH PASSWORD=' + [master].[dbo].[fn_hexadecimal](password_hash) + ' HASHED,
 		SID = ' + [master].[dbo].[fn_hexadecimal]([sid]) + ',  
-		DEFAULT_DATABASE=[' + default_database_name + '], DEFAULT_LANGUAGE=[us_english], 
-		CHECK_EXPIRATION=' + CASE WHEN is_expiration_checked = 1 THEN 'ON' ELSE 'OFF' END + ', CHECK_POLICY=OFF
+		DEFAULT_DATABASE=[' + default_database_name + '], 
+		DEFAULT_LANGUAGE=[us_english], 
+		CHECK_EXPIRATION=' + CASE WHEN is_expiration_checked = 1 THEN 'ON' ELSE 'OFF' END + ', 
+		CHECK_POLICY=OFF
 GO
 IF EXISTS (SELECT * FROM master.sys.sql_logins WHERE [name] = ''' + [name] + ''')
 	ALTER LOGIN [' + [name] + ']
@@ -59,7 +61,7 @@ and [name] not like '##%'
 --and [name] not in ('sa', 'guest')
 
 PRINT '-----------------------------------------------------------------------------'
-PRINT '-- Disable any logins'
+PRINT '-- Disable any disabled logins'
 PRINT '-----------------------------------------------------------------------------'
 SELECT 'ALTER LOGIN [' + [name] + '] DISABLE
 GO
