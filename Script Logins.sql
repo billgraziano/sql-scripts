@@ -63,7 +63,7 @@ and [name] not like '##%'
 PRINT '-----------------------------------------------------------------------------'
 PRINT '-- Disable any disabled logins'
 PRINT '-----------------------------------------------------------------------------'
-SELECT 'ALTER LOGIN [' + [name] + '] DISABLE
+SELECT 'ALTER LOGIN [' + [name] + '] DISABLE;
 GO
 ' 
 from master.sys.server_principals 
